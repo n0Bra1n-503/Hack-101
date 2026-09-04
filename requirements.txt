@@ -1,0 +1,22 @@
+# SkyGuard AI — Backend Dependencies (Phase 1 Ready)
+
+# Web & API Framework
+fastapi
+uvicorn[standard]
+
+# Validation & Settings
+pydantic
+pydantic-settings
+python-dotenv
+
+# Database ORM
+sqlalchemy
+
+# Data Processing & Analysis
+pandas
+numpy
+scikit-learn
+
+# Testing & Client
+pytest
+httpx
