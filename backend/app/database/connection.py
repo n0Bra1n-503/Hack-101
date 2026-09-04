@@ -24,8 +24,8 @@ Base = declarative_base()
 def init_db() -> None:
     """Create all registered database tables in the configured database."""
     # Import all models to ensure registration with Base.metadata
-    import backend.app.models.reading  # noqa: F401
+    import backend.app.models  # noqa: F401
 
-    logger.info(f"Initializing database schema at {settings.DATABASE_URL}...")
+    logger.info("Initializing database schema...")
     Base.metadata.create_all(bind=engine)
     logger.info("Database schema initialized successfully.")
