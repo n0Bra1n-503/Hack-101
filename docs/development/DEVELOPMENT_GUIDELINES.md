@@ -100,3 +100,29 @@ No phase is considered complete without passing all automated tests and verifyin
   * **Never modify `main`**.
   * **Never merge into `main` without explicit peer review and authorization**.
   * **Never force push (`git push --force`) to shared team branches**.
+
+---
+
+## 4. Phase 1 Implementation Flow: Backend Foundation & Ingestion
+
+The implemented Phase 1 pipeline follows the strict layered execution flow:
+
+```text
+data source
+     ↓
+POST /api/readings
+     ↓
+Pydantic validation
+     ↓
+ingestion service
+     ↓
+database
+     ↓
+retrieval API
+```
+
+### Core Phase 1 Scope Boundaries:
+1. **Structural Validation Only**: Phase 1 validates syntax, mandatory fields, numeric types, and coordinate ranges.
+2. **No Weather Authenticity Determination**: Phase 1 **does NOT** determine whether weather is genuine or faulty.
+3. **Acceptance of Extreme Observations**: Extreme readings (e.g., `temperature = 55.0°C`) are structurally valid and are accepted with `HTTP 201 Created`. Anomaly detection, Trust Scoring, and weather-vs-sensor classification belong exclusively to subsequent phases.
+4. **Raw Data Immutability**: All ingested readings are stored as immutable records in the `readings` table. Duplicates are rejected with `HTTP 409 Conflict`.

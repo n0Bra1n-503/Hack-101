@@ -109,8 +109,27 @@ Mitali's subsystem encapsulates:
 
 ---
 
-## 7. Development Status
+## 7. Implementation Roadmap & Development Status
 
-* **Current Status**: `Architecture & Contracts Reconciled (Phase 0 Complete)`
-* **Current Step**: Reconciled data contracts, architecture specifications, and engineering guidelines with Disaster Risk / Early Warning and Public / Citizen Safety requirements.
-* **Phase 1 Status**: **PHASE 1 NOT STARTED**.
+| Phase | Milestone Description | Status |
+| :--- | :--- | :--- |
+| **Phase 0** | Architecture, Data Contracts & Reconciliation | **COMPLETED** |
+| **Phase 1** | Backend Foundation + Weather Data Ingestion | **COMPLETED (CURRENT)** |
+| **Phase 2** | Synthetic Fault Injection & Benchmark Dataset | *UPCOMING* |
+| **Phase 3** | Feature Engineering & Anomaly Detection Pipeline | *UPCOMING* |
+| **Phase 4** | Consistency Engine & Decision Intelligence (Weather vs Sensor) | *UPCOMING* |
+| **Phase 5** | Trust Scoring, Explanations & Value Corrections | *UPCOMING* |
+| **Phase 6** | Digital Twin, Sensor Health & Maintenance Prioritization | *UPCOMING* |
+| **Phase 7** | Validated Weather Events & Disaster Risk Integration | *UPCOMING* |
+| **Phase 8** | Public / Citizen Safety View & API Gateway | *UPCOMING* |
+| **Phase 9** | Real-Time WebSocket Streaming (`/ws/live`) | *UPCOMING* |
+| **Phase 10** | Downstream Cascade Impact Simulator | *UPCOMING* |
+| **Phase 11** | Frontend Integration (Darshita & Medhvi) | *UPCOMING* |
+
+### Phase 1 Deliverables:
+* **FastAPI Application**: Operational backend serving `GET /`, `GET /health`, and auto-docs at `/docs`.
+* **Telemetry Ingestion**: `POST /api/readings` validating 16-variable canonical weather observations with Pydantic.
+* **Extreme Weather Acceptance**: Accepts extreme observations (e.g., 55°C) without domain bias; authenticity determination deferred to ML phases.
+* **Persistent Storage**: SQLAlchemy ORM storing immutable raw observations in SQLite/PostgreSQL with composite indexes.
+* **Retrieval APIs**: `GET /api/stations/{id}/readings` with time-range filtering and `GET /api/readings/{id}`.
+* **Automated Tests**: Complete test coverage via `pytest` (`tests/test_ingestion.py`).
