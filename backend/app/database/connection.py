@@ -13,10 +13,16 @@ engine_kwargs = {}
 if settings.DATABASE_URL.startswith("sqlite"):
     connect_args["check_same_thread"] = False
 else:
+    connect_args["connect_timeout"] = 10
+    connect_args["keepalives"] = 1
+    connect_args["keepalives_idle"] = 30
+    connect_args["keepalives_interval"] = 10
+    connect_args["keepalives_count"] = 5
     engine_kwargs["pool_pre_ping"] = True
-    engine_kwargs["pool_recycle"] = 300
-    engine_kwargs["pool_size"] = 10
-    engine_kwargs["max_overflow"] = 20
+    engine_kwargs["pool_recycle"] = 60
+    engine_kwargs["pool_size"] = 5
+    engine_kwargs["max_overflow"] = 10
+    engine_kwargs["pool_timeout"] = 20
 
 engine = create_engine(
     settings.DATABASE_URL,

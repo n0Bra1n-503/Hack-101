@@ -1,4 +1,4 @@
-﻿"""Historical Telemetry Replay Engine.
+"""Historical Telemetry Replay Engine.
 
 Replays actual historical weather observations from the database through the full
 pipeline (ML -> Decision Intelligence -> Trust -> Health -> Risk) and streams
@@ -33,7 +33,7 @@ class ReplayEngine:
         self._task: Optional[asyncio.Task] = None
         self._replay_readings: List[Dict[str, Any]] = []
 
-    def start(self, station_id: Optional[str] = None, speed: float = 1.0) -> Dict[str, Any]:
+    async def start(self, station_id: Optional[str] = None, speed: float = 1.0) -> Dict[str, Any]:
         """Start or restart historical replay."""
         self.reset()
         self.station_id = station_id

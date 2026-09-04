@@ -18,8 +18,8 @@ class ReplaySpeedRequest(BaseModel):
 
 
 @router.post("/start")
-def start_replay(req: ReplayStartRequest) -> Dict[str, Any]:
-    return replay_engine.start(station_id=req.station_id, speed=req.speed)
+async def start_replay(req: ReplayStartRequest) -> Dict[str, Any]:
+    return await replay_engine.start(station_id=req.station_id, speed=req.speed)
 
 
 @router.post("/pause")

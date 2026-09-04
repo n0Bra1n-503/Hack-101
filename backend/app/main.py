@@ -116,10 +116,26 @@ def health_endpoint() -> dict:
     }
 
 
+from backend.app.api.stations import get_network_summary
+from backend.app.database.session import get_db
+from fastapi import Depends
+
+
+@app.get(
+    "/summary",
+    tags=["Root"],
+    summary="Direct network summary alias",
+    description="Returns network summary metrics directly for clients requesting /summary without /api prefix.",
+)
+def root_summary_alias(db=Depends(get_db)):
+    """Return network summary directly so /summary never falls through to SPA HTML."""
+    return get_network_summary(db=db)
+
+
 # SPA client-side routing fallback for web pages
 @app.get("/{full_path:path}", include_in_schema=False)
 async def spa_fallback(full_path: str, request: Request):
-    if any(full_path.startswith(p) for p in ("api", "ws", "docs", "redoc", "openapi")):
+    if any(full_path.startswith(p) for p in ("api", "ws", "docs", "redoc", "openapi", "summary")):
         return JSONResponse(
             status_code=404,
             content={"error": "not_found", "message": f"Endpoint '/{full_path}' not found"},
