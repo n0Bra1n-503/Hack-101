@@ -130,6 +130,7 @@ def get_readings_by_station(
     db: Session,
     start_time: Optional[datetime] = None,
     end_time: Optional[datetime] = None,
+    limit: Optional[int] = None,
 ) -> List[Reading]:
     """Retrieve historical stored readings for a given station with optional time-range filtering.
 
@@ -138,6 +139,7 @@ def get_readings_by_station(
         db: Active SQLAlchemy database session.
         start_time: Optional UTC ISO start timestamp.
         end_time: Optional UTC ISO end timestamp.
+        limit: Optional maximum number of records to return.
 
     Returns:
         List of matching SQLAlchemy Reading model instances.
@@ -155,7 +157,11 @@ def get_readings_by_station(
     if end_time:
         query = query.filter(Reading.timestamp <= end_time)
 
-    return query.order_by(Reading.timestamp.asc()).all()
+    query = query.order_by(Reading.timestamp.asc())
+    if limit:
+        query = query.limit(limit)
+
+    return query.all()
 
 
 def prepare_record_dict(data: dict) -> dict:

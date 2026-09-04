@@ -1,4 +1,4 @@
-﻿"""Digital Twin and Predictive Maintenance Service."""
+"""Digital Twin and Predictive Maintenance Service."""
 
 import logging
 from datetime import datetime
@@ -117,9 +117,24 @@ class SensorHealthService:
                     {"name": "Pressure", "status": "nominal", "drift": 0.01},
                     {"name": "Humidity", "status": "nominal", "drift": 0.03},
                 ],
+                "stationId": station_id,
+                "health": 98.5,
+                "trust": 98.5,
+                "trend": "stable",
+                "faultHistory": [],
+                "maintenancePriority": "LOW",
             }
 
         status = "HEALTHY" if health.recent_health_score > 75 else ("WARNING" if health.recent_health_score > 40 else "CRITICAL")
+        fault_history = []
+        if health.last_fault_type:
+            d_str = health.last_fault_timestamp.strftime("%Y-%m-%d") if health.last_fault_timestamp else "Recent"
+            fault_history.append({
+                "date": d_str,
+                "type": health.last_fault_type,
+                "variable": "temperature" if "temp" in str(health.last_fault_type).lower() else "humidity",
+            })
+
         return {
             "station_id": station_id,
             "health_score": health.recent_health_score,
@@ -135,13 +150,27 @@ class SensorHealthService:
                 {"name": "Pressure", "status": "nominal", "drift": 0.01},
                 {"name": "Humidity", "status": "nominal", "drift": 0.02},
             ],
+            "stationId": station_id,
+            "health": health.recent_health_score,
+            "trust": health.recent_health_score,
+            "trend": "declining" if health.recent_health_score < 80 else "stable",
+            "faultHistory": fault_history,
+            "maintenancePriority": health.maintenance_priority,
         }
+
+    def get_all_stations_health_map(self, db: Session) -> Dict[str, SensorHealth]:
+        """Fetch all sensor health records in a single database query to prevent N+1 queries."""
+        records = db.query(SensorHealth).all()
+        return {h.station_id: h for h in records}
 
     def get_maintenance_queue(self, db: Session) -> List[Dict[str, Any]]:
         """Return active maintenance tasks."""
         tasks = db.query(MaintenanceTask).order_by(MaintenanceTask.created_at.desc()).all()
-        return [
-            {
+        health_map = self.get_all_stations_health_map(db)
+        results = []
+        for t in tasks:
+            h = health_map.get(t.station_id)
+            results.append({
                 "id": t.maintenance_id,
                 "station_id": t.station_id,
                 "priority": t.priority,
@@ -150,9 +179,15 @@ class SensorHealthService:
                 "fault_type": t.fault_type,
                 "recommended_action": t.recommended_action,
                 "created_at": t.created_at.isoformat(),
-            }
-            for t in tasks
-        ]
+                "stationId": t.station_id,
+                "health": h.recent_health_score if h else 65.0,
+                "trust": h.recent_health_score if h else 45.0,
+                "trend": "declining" if (h and h.recent_health_score < 80) else "stable",
+                "faults30d": h.fault_count if h else 1,
+                "reason": t.issue_description,
+                "action": t.recommended_action,
+            })
+        return results
 
 
 health_service = SensorHealthService()

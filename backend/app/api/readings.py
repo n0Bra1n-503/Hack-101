@@ -79,6 +79,7 @@ def get_station_readings(
     id: str,
     start_time: Optional[datetime] = Query(None, description="Optional start timestamp filter (UTC)"),
     end_time: Optional[datetime] = Query(None, description="Optional end timestamp filter (UTC)"),
+    limit: Optional[int] = Query(None, description="Optional maximum number of readings to return"),
     db: Session = Depends(get_db),
 ) -> List[ReadingResponse]:
     """Retrieve all readings for a station with optional time-range filtering."""
@@ -87,6 +88,7 @@ def get_station_readings(
         db=db,
         start_time=start_time,
         end_time=end_time,
+        limit=limit,
     )
     return [ReadingResponse.model_validate(r) for r in readings]
 

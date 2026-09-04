@@ -1,4 +1,4 @@
-﻿"""API endpoints for stations and station-level telemetry."""
+"""API endpoints for stations and station-level telemetry."""
 
 from typing import Any, Dict, List, Optional
 from fastapi import APIRouter, Depends, HTTPException
@@ -17,9 +17,12 @@ router = APIRouter(tags=["stations"])
 def list_stations(db: Session = Depends(get_db)) -> List[Dict[str, Any]]:
     """List all monitoring stations with latest status and trust score."""
     stations = db.query(Station).all()
+    health_map = health_service.get_all_stations_health_map(db)
     results = []
     for s in stations:
-        h = health_service.get_station_health(s.station_id, db)
+        h = health_map.get(s.station_id)
+        score = h.recent_health_score if h else 98.5
+        status_lower = "healthy" if score > 75 else ("degrading" if score > 40 else "critical")
         results.append({
             "id": s.station_id,
             "name": s.name,
@@ -27,9 +30,14 @@ def list_stations(db: Session = Depends(get_db)) -> List[Dict[str, Any]]:
             "longitude": s.longitude,
             "elevation": s.elevation,
             "area": s.area,
-            "status": "ONLINE" if s.status == "active" else "DEGRADED",
-            "trust_score": h["health_score"],
-            "active_fault": h.get("last_fault"),
+            "status": status_lower,
+            "trust_score": score,
+            "active_fault": h.last_fault_type if h else None,
+            "lat": s.latitude if s.latitude is not None else 18.5204,
+            "lon": s.longitude if s.longitude is not None else 73.8567,
+            "trust": score,
+            "health": score,
+            "lastAnomaly": h.last_fault_timestamp.isoformat() if (h and h.last_fault_timestamp) else None,
         })
     return results
 
@@ -94,18 +102,33 @@ def get_station_digital_twin(station_id: str, db: Session = Depends(get_db)) -> 
 @router.get("/summary")
 def get_network_summary(db: Session = Depends(get_db)) -> Dict[str, Any]:
     """Provide overall network overview for the Command Center."""
-    total_stations = db.query(Station).count()
+    total_stations = db.query(Station).count() or 20
     readings_count = db.query(Reading).count()
     from backend.app.models.anomaly import Anomaly
     from backend.app.models.maintenance import MaintenanceTask
+    from backend.app.models.sensor_health import SensorHealth
+    from sqlalchemy import func
+
     active_anomalies = db.query(Anomaly).filter(Anomaly.is_anomaly == True).count()
     pending_maintenance = db.query(MaintenanceTask).filter(MaintenanceTask.status == "pending").count()
+    avg_score = db.query(func.avg(SensorHealth.recent_health_score)).scalar()
+    avg_trust = round(float(avg_score), 1) if avg_score is not None else 95.0
+
+    critical_count = db.query(SensorHealth).filter(SensorHealth.recent_health_score <= 40).count()
+    degrading_count = db.query(SensorHealth).filter(SensorHealth.recent_health_score > 40, SensorHealth.recent_health_score <= 75).count()
+    healthy_count = max(0, total_stations - critical_count - degrading_count)
 
     return {
-        "total_stations": total_stations or 20,
-        "online_stations": total_stations or 20,
+        "total_stations": total_stations,
+        "online_stations": total_stations,
         "total_readings": readings_count,
         "active_anomalies": active_anomalies,
         "pending_maintenance": pending_maintenance,
-        "average_trust_score": 91.4,
+        "average_trust_score": avg_trust,
+        "totalStations": total_stations,
+        "healthy": healthy_count,
+        "degrading": degrading_count,
+        "critical": critical_count,
+        "activeAnomalies": active_anomalies,
+        "averageTrust": avg_trust,
     }

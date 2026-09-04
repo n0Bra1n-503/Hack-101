@@ -1,4 +1,4 @@
-﻿"""Cascade Simulator Service demonstrating the 3 core illustrative pipeline scenarios.
+"""Cascade Simulator Service demonstrating the 3 core illustrative pipeline scenarios.
 
 Scenario A: Faulty Extreme (Spike -> ML Anomaly -> Sensor Fault -> Low Trust -> Correction -> Risk Blocked)
 Scenario B: Genuine Extreme (Multi-station Heat -> ML Anomaly -> Genuine Weather -> High Trust -> High Risk -> Citizen Alert)
@@ -29,10 +29,21 @@ class CascadeSimulatorService:
     def _scenario_a_faulty_extreme(self) -> Dict[str, Any]:
         return {
             "id": "scenario-a",
+            "anomalyId": "scenario-a",
             "scenario": "SCENARIO_A",
             "title": "Scenario A: Sensor Fault Mitigation (Hardware Spike)",
             "description": "An isolated hardware thermistor failure causes a 55°C spike. The pipeline correctly identifies the sensor fault, blocks false disaster alarms, lowers trust score, and proposes an operational correction.",
             "mode": "illustrative_simulation",
+            "illustrative": True,
+            "withoutSkyguard": {
+                "label": "FALSE HEATWAVE ALERT",
+                "description": "Raw 55°C reading propagates directly into downstream forecast rules, triggering widespread citizen panic and unwarranted alerts.",
+            },
+            "withSkyguard": {
+                "label": "NO FALSE ALERT",
+                "description": "SkyGuard flags the reading as a sensor fault, blocks automated disaster alarms, lowers trust score, and proposes a peer-corroborated correction.",
+            },
+            "impactSummary": "One false public disaster alert prevented. Automated field maintenance ticket scheduled.",
             "stages": [
                 {
                     "stage": 1,
@@ -123,10 +134,21 @@ class CascadeSimulatorService:
     def _scenario_b_genuine_extreme(self) -> Dict[str, Any]:
         return {
             "id": "scenario-b",
+            "anomalyId": "scenario-b",
             "scenario": "SCENARIO_B",
             "title": "Scenario B: Genuine Extreme Weather Event (Heatwave)",
             "description": "Multi-station regional heatwave reaches 44.5°C. Decision Intelligence confirms genuine weather through peer corroboration, assigns high trust, triggers disaster risk, and issues citizen advisories.",
             "mode": "illustrative_simulation",
+            "illustrative": True,
+            "withoutSkyguard": {
+                "label": "DELAYED DISASTER ALERT",
+                "description": "Traditional single-threshold systems require slow manual verification before alerting, losing crucial early warning response time.",
+            },
+            "withSkyguard": {
+                "label": "VALIDATED REAL-TIME ADVISORY",
+                "description": "Decision Intelligence cross-validates 5 peer stations, confirms authentic heatwave, and deploys high-confidence public safety warnings instantly.",
+            },
+            "impactSummary": "Timely high-confidence public safety advisory issued across 5 districts with verified peer station consensus.",
             "stages": [
                 {
                     "stage": 1,
@@ -215,10 +237,21 @@ class CascadeSimulatorService:
     def _scenario_c_uncertain(self) -> Dict[str, Any]:
         return {
             "id": "scenario-c",
+            "anomalyId": "scenario-c",
             "scenario": "SCENARIO_C",
             "title": "Scenario C: Uncertain Anomaly Gating (Human Review)",
             "description": "An isolated reading shows unexpected temperature jump but peer network connectivity is sparse. The pipeline gates the event as UNCERTAIN, blocking automatic public alarms and escalating to manual operator review.",
             "mode": "illustrative_simulation",
+            "illustrative": True,
+            "withoutSkyguard": {
+                "label": "UNCHECKED AMBIGUITY",
+                "description": "Marginal anomalies in sparse network regions trigger either false alarms or total silence without contextual reasoning.",
+            },
+            "withSkyguard": {
+                "label": "GATED OPERATOR ESCALATION",
+                "description": "SkyGuard detects ambiguous evidence, gates automatic broadcast, holds provisional trust, and routes to human operator review.",
+            },
+            "impactSummary": "Automatic public alert safely gated; escalated to regional meteorologist dashboard for verification.",
             "stages": [
                 {
                     "stage": 1,

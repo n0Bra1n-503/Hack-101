@@ -1,4 +1,4 @@
-﻿"""API endpoints for disaster risk intelligence and citizen public safety."""
+"""API endpoints for disaster risk intelligence and citizen public safety."""
 
 from typing import Any, Dict, List
 from fastapi import APIRouter, Depends, HTTPException
@@ -39,6 +39,7 @@ def get_risk_detail(risk_id: str, db: Session = Depends(get_db)) -> Dict[str, An
 
 
 @router.get("/areas/{area}/risk")
+@router.get("/risks/area/{area}")
 def get_area_risk(area: str, db: Session = Depends(get_db)) -> Dict[str, Any]:
     """Get internal disaster risk assessment for a specific geographic area."""
     return risk_service.get_public_safety_view(area, db)

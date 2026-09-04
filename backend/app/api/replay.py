@@ -1,4 +1,4 @@
-﻿"""API endpoints for Historical Telemetry Replay."""
+"""API endpoints for Historical Telemetry Replay."""
 
 from typing import Any, Dict, Optional
 from fastapi import APIRouter
@@ -34,6 +34,11 @@ def resume_replay() -> Dict[str, Any]:
 
 @router.post("/reset")
 def reset_replay() -> Dict[str, Any]:
+    return replay_engine.reset()
+
+
+@router.post("/stop")
+def stop_replay() -> Dict[str, Any]:
     return replay_engine.reset()
 
 
