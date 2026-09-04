@@ -1,6 +1,7 @@
 """Pydantic schemas for weather reading ingestion, validation, and responses."""
 
 import hashlib
+import math
 from datetime import datetime
 from typing import Any, Optional
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -111,7 +112,7 @@ class ReadingBase(BaseModel):
     @model_validator(mode="before")
     @classmethod
     def map_raw_field_aliases(cls, data: Any) -> Any:
-        """Map raw source field names to canonical SkyGuard schema names."""
+        """Map raw source field names to canonical SkyGuard schema names and convert NaN to None."""
         if isinstance(data, dict):
             data = data.copy()
             if "relative_humidity" in data and "humidity" not in data:
@@ -120,6 +121,11 @@ class ReadingBase(BaseModel):
                 data["pressure"] = data.pop("atmospheric_pressure")
             if "altitude" in data and "elevation" not in data:
                 data["elevation"] = data.pop("altitude")
+
+            # Strictly convert any NaN float values to None (representing SQL NULL)
+            for k, v in list(data.items()):
+                if isinstance(v, float) and math.isnan(v):
+                    data[k] = None
         return data
 
 
