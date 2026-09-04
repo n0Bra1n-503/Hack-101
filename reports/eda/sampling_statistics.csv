@@ -1,0 +1,6 @@
+scope,total_timestamps,median_interval_minutes,common_interval_minutes,min_interval_minutes,max_interval_minutes,mean_interval_minutes,large_gaps_count,start_time,end_time
+OVERALL,2016,5.0,5.0,5.0,5.0,5.0,0,2024-05-11 00:00:00,2024-05-17 23:55:00
+Station: CWPRS campus,2016,5.0,5.0,5.0,5.0,5.0,0,2024-05-11 00:00:00,2024-05-17 23:55:00
+Station: Lavale AWS,2016,5.0,5.0,5.0,5.0,5.0,0,2024-05-11 00:00:00,2024-05-17 23:55:00
+Station: Pashan AWS,2016,5.0,5.0,5.0,5.0,5.0,0,2024-05-11 00:00:00,2024-05-17 23:55:00
+Station: Shivajinagar AWS,2009,5.0,5.0,5.0,40.0,5.02,1,2024-05-11 00:00:00,2024-05-17 23:55:00

@@ -1,0 +1,14 @@
+column,data_type,total_rows,null_count,null_percentage,unique_values,is_constant,non_numeric_count,duplicate_rows_dataset,duplicate_timestamps
+station_id,str,8057,0,0.0,4,False,0,0,0
+latitude,float64,8057,0,0.0,4,False,0,0,0
+longitude,float64,8057,0,0.0,4,False,0,0,0
+original_time,str,8057,0,0.0,2016,False,0,0,0
+timestamp,str,8057,0,0.0,2016,False,0,0,0
+year,int64,8057,0,0.0,1,True,0,0,0
+month,int64,8057,0,0.0,1,True,0,0,0
+day,int64,8057,0,0.0,7,False,0,0,0
+hour,int64,8057,0,0.0,24,False,0,0,0
+day_of_year,int64,8057,0,0.0,7,False,0,0,0
+temperature,float64,8057,0,0.0,188,False,0,0,0
+pressure,float64,8057,0,0.0,921,False,0,0,0
+humidity,float64,8057,0,0.0,558,False,0,0,0

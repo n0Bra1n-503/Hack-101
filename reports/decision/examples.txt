@@ -1,0 +1,30 @@
+--- Example: NORMAL ---
+Trust Score: 85.5
+Classification: GENUINE_WEATHER
+Inferred Type: NONE
+Reasons: Behavior appears normal and consistent.
+
+--- Example: DROPOUT ---
+Trust Score: 58.6
+Classification: SENSOR_FAULT
+Inferred Type: SPIKE
+Reasons: Behavior appears normal and consistent.
+
+--- Example: FROZEN ---
+Trust Score: 58.1
+Classification: SENSOR_FAULT
+Inferred Type: SPIKE
+Reasons: Behavior appears normal and consistent.
+
+--- Example: SPIKE ---
+Trust Score: 33.1
+Classification: SENSOR_FAULT
+Inferred Type: UNKNOWN
+Reasons: Autoencoder reconstruction error is extremely high.; Only one sensor is exhibiting abnormal behavior.; Strong deviation from statistical baseline.
+
+--- Example: MULTIVARIATE_INCONSISTENCY ---
+Trust Score: 29.2
+Classification: SENSOR_FAULT
+Inferred Type: UNKNOWN
+Reasons: Autoencoder reconstruction error is extremely high.; Only one sensor is exhibiting abnormal behavior.; Strong deviation from statistical baseline.
+

@@ -1,0 +1,68 @@
+feature_name,category,dtype,missing_pct,unique_values,description
+day_of_week,temporal,int32,0.0,7,Day of the week (0-6)
+hour_sin,temporal,float64,0.0,22,Sine encoding of hour
+hour_cos,temporal,float64,0.0,22,Cosine encoding of hour
+temperature_lag_1,lag,float64,0.05,189,Value of temperature 1 steps ago
+temperature_delta_1,delta,float64,0.05,40,Difference in temperature compared to 1 steps ago
+temperature_lag_3,lag,float64,0.15,189,Value of temperature 3 steps ago
+temperature_delta_3,delta,float64,0.15,83,Difference in temperature compared to 3 steps ago
+pressure_lag_1,lag,float64,0.05,922,Value of pressure 1 steps ago
+pressure_delta_1,delta,float64,0.05,118,Difference in pressure compared to 1 steps ago
+pressure_lag_3,lag,float64,0.15,922,Value of pressure 3 steps ago
+pressure_delta_3,delta,float64,0.15,216,Difference in pressure compared to 3 steps ago
+humidity_lag_1,lag,float64,0.05,559,Value of humidity 1 steps ago
+humidity_delta_1,delta,float64,0.05,118,Difference in humidity compared to 1 steps ago
+humidity_lag_3,lag,float64,0.15,559,Value of humidity 3 steps ago
+humidity_delta_3,delta,float64,0.15,230,Difference in humidity compared to 3 steps ago
+temperature_roll_mean_6,rolling,float64,0.15,1739,Rolling mean of temperature over 6 steps prior
+temperature_roll_std_6,rolling,float64,0.15,7666,Rolling std of temperature over 6 steps prior
+temperature_roll_min_6,rolling,float64,0.15,184,Rolling min of temperature over 6 steps prior
+temperature_roll_max_6,rolling,float64,0.15,184,Rolling max of temperature over 6 steps prior
+temperature_dev_roll_mean_6,baseline_deviation,float64,0.15,545,Absolute deviation from 6-step rolling mean
+temperature_zscore_roll_6,baseline_deviation,float64,0.15,7914,Z-score deviation from 6-step rolling distribution
+temperature_roll_mean_24,rolling,float64,0.6,4459,Rolling mean of temperature over 24 steps prior
+temperature_roll_std_24,rolling,float64,0.6,7924,Rolling std of temperature over 24 steps prior
+temperature_roll_min_24,rolling,float64,0.6,179,Rolling min of temperature over 24 steps prior
+temperature_roll_max_24,rolling,float64,0.6,177,Rolling max of temperature over 24 steps prior
+temperature_dev_roll_mean_24,baseline_deviation,float64,0.6,3243,Absolute deviation from 24-step rolling mean
+temperature_zscore_roll_24,baseline_deviation,float64,0.6,7988,Z-score deviation from 24-step rolling distribution
+pressure_roll_mean_6,rolling,float64,0.15,4791,Rolling mean of pressure over 6 steps prior
+pressure_roll_std_6,rolling,float64,0.15,7966,Rolling std of pressure over 6 steps prior
+pressure_roll_min_6,rolling,float64,0.15,857,Rolling min of pressure over 6 steps prior
+pressure_roll_max_6,rolling,float64,0.15,857,Rolling max of pressure over 6 steps prior
+pressure_dev_roll_mean_6,baseline_deviation,float64,0.15,1655,Absolute deviation from 6-step rolling mean
+pressure_zscore_roll_6,baseline_deviation,float64,0.15,8034,Z-score deviation from 6-step rolling distribution
+pressure_roll_mean_24,rolling,float64,0.6,6860,Rolling mean of pressure over 24 steps prior
+pressure_roll_std_24,rolling,float64,0.6,7991,Rolling std of pressure over 24 steps prior
+pressure_roll_min_24,rolling,float64,0.6,810,Rolling min of pressure over 24 steps prior
+pressure_roll_max_24,rolling,float64,0.6,818,Rolling max of pressure over 24 steps prior
+pressure_dev_roll_mean_24,baseline_deviation,float64,0.6,5965,Absolute deviation from 24-step rolling mean
+pressure_zscore_roll_24,baseline_deviation,float64,0.6,8009,Z-score deviation from 24-step rolling distribution
+humidity_roll_mean_6,rolling,float64,0.15,3746,Rolling mean of humidity over 6 steps prior
+humidity_roll_std_6,rolling,float64,0.15,7933,Rolling std of humidity over 6 steps prior
+humidity_roll_min_6,rolling,float64,0.15,547,Rolling min of humidity over 6 steps prior
+humidity_roll_max_6,rolling,float64,0.15,548,Rolling max of humidity over 6 steps prior
+humidity_dev_roll_mean_6,baseline_deviation,float64,0.15,1457,Absolute deviation from 6-step rolling mean
+humidity_zscore_roll_6,baseline_deviation,float64,0.15,8011,Z-score deviation from 6-step rolling distribution
+humidity_roll_mean_24,rolling,float64,0.6,6356,Rolling mean of humidity over 24 steps prior
+humidity_roll_std_24,rolling,float64,0.6,7987,Rolling std of humidity over 24 steps prior
+humidity_roll_min_24,rolling,float64,0.6,525,Rolling min of humidity over 24 steps prior
+humidity_roll_max_24,rolling,float64,0.6,529,Rolling max of humidity over 24 steps prior
+humidity_dev_roll_mean_24,baseline_deviation,float64,0.6,5486,Absolute deviation from 24-step rolling mean
+humidity_zscore_roll_24,baseline_deviation,float64,0.6,8008,Z-score deviation from 24-step rolling distribution
+temp_humid_product,cross_sensor,float64,0.0,5526,Product of temperature and humidity
+temp_humid_ratio,cross_sensor,float64,0.0,5915,Ratio of temperature to humidity
+press_temp_ratio,cross_sensor,float64,0.0,7666,Ratio of pressure to temperature
+temperature_peer_median,cross_station,float64,0.0,187,Median of temperature across all other stations at the same timestamp
+temperature_dev_peer_median,cross_station,float64,0.0,135,Deviation of temperature from peer station median
+pressure_peer_median,cross_station,float64,0.0,780,Median of pressure across all other stations at the same timestamp
+pressure_dev_peer_median,cross_station,float64,0.0,859,Deviation of pressure from peer station median
+humidity_peer_median,cross_station,float64,0.0,537,Median of humidity across all other stations at the same timestamp
+humidity_dev_peer_median,cross_station,float64,0.0,361,Deviation of humidity from peer station median
+temperature_consecutive_identical,persistence,int64,0.0,12,Number of consecutive identical readings for temperature up to current step
+pressure_consecutive_identical,persistence,int64,0.0,3,Number of consecutive identical readings for pressure up to current step
+humidity_consecutive_identical,persistence,int64,0.0,12,Number of consecutive identical readings for humidity up to current step
+temperature_is_missing,missing_data,int64,0.0,1,Binary flag indicating if temperature reading is missing
+pressure_is_missing,missing_data,int64,0.0,1,Binary flag indicating if pressure reading is missing
+humidity_is_missing,missing_data,int64,0.0,1,Binary flag indicating if humidity reading is missing
+time_since_previous_obs_mins,missing_data,float64,0.05,3,Minutes since previous observation for the station

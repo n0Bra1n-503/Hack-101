@@ -1,0 +1,23 @@
+Total False Positives: 548
+Total False Negatives: 125
+
+--- False Positive Examples (Normal -> SENSOR_FAULT) ---
+Idx 4 | IF: 0.57 | AE: 0.19 | Stat: 0.16
+Explanation: Behavior appears normal and consistent.
+
+Idx 8 | IF: 0.54 | AE: 0.18 | Stat: 0.21
+Explanation: Behavior appears normal and consistent.
+
+Idx 266 | IF: 0.73 | AE: 1.00 | Stat: 0.25
+Explanation: Autoencoder reconstruction error is extremely high.; Only one sensor is exhibiting abnormal behavior.
+
+--- False Negative Examples (Fault -> GENUINE_WEATHER) ---
+Idx 246 (DRIFT) | IF: 0.69 | AE: 0.39 | Stat: 0.11
+Explanation: Behavior appears normal and consistent.
+
+Idx 247 (DRIFT) | IF: 0.71 | AE: 0.53 | Stat: 0.13
+Explanation: Behavior appears normal and consistent.
+
+Idx 391 (FROZEN) | IF: 0.46 | AE: 0.13 | Stat: 0.00
+Explanation: Behavior appears normal and consistent.
+

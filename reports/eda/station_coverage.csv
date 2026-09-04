@@ -1,0 +1,5 @@
+station_id,record_count,latitude,longitude,start_timestamp,end_timestamp,temperature_missing_count,temperature_missing_pct,pressure_missing_count,pressure_missing_pct,humidity_missing_count,humidity_missing_pct
+CWPRS campus,2016,18.446944,73.785,2024-05-11 00:00:00,2024-05-17 23:55:00,0,0.0,0,0.0,0,0.0
+Lavale AWS,2016,18.5422,73.7389,2024-05-11 00:00:00,2024-05-17 23:55:00,0,0.0,0,0.0,0,0.0
+Pashan AWS,2016,18.5362,73.7928,2024-05-11 00:00:00,2024-05-17 23:55:00,0,0.0,0,0.0,0,0.0
+Shivajinagar AWS,2009,18.5308,73.8474,2024-05-11 00:00:00,2024-05-17 23:55:00,0,0.0,0,0.0,0,0.0

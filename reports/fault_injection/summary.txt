@@ -1,0 +1,21 @@
+==================================================
+ SKYGUARD AI - FAULT INJECTION SUMMARY
+==================================================
+
+Total Observations: 8,057
+Total Fault Events: 40
+
+--- By Fault Type ---
+FROZEN: 9
+DROPOUT: 8
+SPIKE: 8
+DRIFT: 6
+MULTIVARIATE_INCONSISTENCY: 5
+ABRUPT_JUMP: 4
+
+--- By Affected Sensor ---
+pressure: 16
+temperature: 12
+humidity: 12
+
+Total Observations Affected: 494 (6.13%)

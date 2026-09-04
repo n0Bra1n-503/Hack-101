@@ -1,0 +1,33 @@
+# SkyGuard AI - Statistical Anomaly Baseline Configuration
+
+# Standard Z-Score threshold (global and station-specific)
+zscore_threshold: 3.0
+
+# Robust Modified Z-Score threshold (based on median & IQR/MAD)
+robust_threshold: 3.5
+
+# Rolling Baseline Z-score threshold (deviation from recent rolling window)
+rolling_z_threshold: 3.0
+
+# Diurnal (Time-of-day / Hour-specific) Z-Score threshold
+diurnal_z_threshold: 3.0
+
+# Cross-Station Deviation Thresholds (absolute differences from peer station median)
+cross_station_dev_thresholds:
+  temperature: 4.0   # °C difference from peer station median
+  pressure: 3.5      # hPa difference from peer station median
+  humidity: 15.0     # % difference from peer station median
+
+# Scoring and Evidence aggregation
+scoring:
+  min_evidence_for_suspicious: 1
+  suspicious_score_threshold: 0.40
+  strongly_unusual_score_threshold: 0.70
+
+  # Relative component weights for composite anomaly score (sums to 1.0)
+  weights:
+    zscore: 0.20
+    robust: 0.20
+    rolling: 0.25
+    diurnal: 0.15
+    cross_station: 0.20

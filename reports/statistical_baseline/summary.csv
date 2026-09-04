@@ -1,0 +1,18 @@
+metric,value,category
+total_observations_analyzed,8057,overall
+statistically_suspicious_count,1679,overall
+statistically_suspicious_pct,20.84%,overall
+severity_normal_count,8050,severity
+severity_slightly_unusual_count,5,severity
+severity_strongly_unusual_count,2,severity
+flagged_by_temperature,612,sensor_breakdown
+flagged_by_pressure,649,sensor_breakdown
+flagged_by_humidity,569,sensor_breakdown
+flagged_by_rolling_deviation,1675,method_breakdown
+flagged_by_cross_station_deviation,7,method_breakdown
+isolated_sensor_deviations,1532,multivariate_evidence
+concurrent_multisensor_deviations,147,multivariate_evidence
+station_CWPRS campus_suspicious,438/2016 (21.73%),station_breakdown
+station_Lavale AWS_suspicious,426/2016 (21.13%),station_breakdown
+station_Pashan AWS_suspicious,401/2016 (19.89%),station_breakdown
+station_Shivajinagar AWS_suspicious,414/2009 (20.61%),station_breakdown
