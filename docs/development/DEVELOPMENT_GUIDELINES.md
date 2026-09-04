@@ -2,118 +2,101 @@
 
 ## 1. Scope & Purpose
 
-This document establishes the mandatory software engineering standards, architectural boundaries, and development principles for all contributors working on **SkyGuard AI**, with specific focus on **Mitali's module** (Decision Intelligence & Backend Integration).
+This document establishes the mandatory software engineering standards, architectural boundaries, and development principles for all contributors working on **SkyGuard AI**, with specific focus on **Mitali's module** (Decision Intelligence, Backend Integration & Risk Integration).
 
-Adherence to these rules guarantees system stability, testability, auditability, and clean integration across all six sub-teams.
+Adherence to these rules guarantees system stability, testability, auditability, safety, and clean integration across all six sub-teams.
 
 ---
 
 ## 2. The Ten Golden Rules of SkyGuard AI
 
-### Rule 1: Do Not Put Business Logic in `main.py`
-* `main.py` (when implemented in Phase 1) is strictly reserved for:
-  * Application instantiation (`FastAPI(...)`).
-  * Middleware registration (CORS, timing, logging).
-  * Top-level lifecycle event handlers (`lifespan`, startup, shutdown).
-  * Router inclusions (`app.include_router(...)`).
-* No data transformation, database queries, mathematical calculations, or ML model calls are permitted directly within `main.py`.
+### Rule 1: No Business Logic in API Routes
+* API routes (`backend/app/api/`) are strictly reserved for:
+  * Transport handling (HTTP request parsing, status codes, query/path parameters).
+  * Payload validation via Pydantic schemas.
+  * Delegating execution to appropriate service functions (`backend/app/services/`).
+  * Returning serialized responses.
+* No mathematical computations, risk calculations, database transactions, ML calls, or data transformations are permitted directly inside route handlers.
 
----
+### Rule 2: Never Overwrite Raw Weather Data
+* Raw sensor telemetry is an immutable historical observation record.
+* Once written to persistent storage, raw reading rows must **never** be updated, overwritten, or deleted in place.
+* Suggested corrections and imputed estimates exist exclusively as separate relational records in the `corrections` table, referencing the original `reading_id`.
+* The review lifecycle (`SUGGESTED` $\to$ `PENDING_REVIEW` $\to$ `ACCEPTED` / `REJECTED`) ensures full scientific traceability and audit compliance.
 
-### Rule 2: Strict Separation of Concerns (API, Schema, Service, Model)
-Code must adhere strictly to a layered architecture:
-* **`api/` (Routers)**: Handle HTTP/WebSocket transport, extract query/path parameters, invoke services, and return responses. No business logic.
-* **`schemas/` (Pydantic Models)**: Define data contracts, request payloads, response serialization, and data validation rules. No database access.
-* **`services/` (Business & Intelligence Logic)**: Contain all reasoning, evidence calculation, trust scoring, and workflow orchestration. Stateless wherever possible.
-* **`models/` (SQLAlchemy ORM)**: Define database tables, relationships, indexes, and persistence schemas. No business rules.
+### Rule 3: `anomaly_score != trust_score`
+* An anomaly score measures **statistical rarity** ($0.0 \to 1.0$), while a Trust Score measures **operational dependability** ($0 \to 100$).
+* A genuine extreme meteorological phenomenon (e.g., severe squall line or flash heatwave) will exhibit a high anomaly score, yet possess a high Trust Score because cross-station corroboration confirms it is authentic.
+* Conversely, an isolated hardware glitch (e.g., sensor pin short) yields a high anomaly score but a very low Trust Score.
+* Trust Score must always be calculated through multidimensional evidence synthesis, never as an inversion of an anomaly score.
 
----
+### Rule 4: Extreme Reading Does Not Directly Create Disaster Risk
+* **Safety Invariant**: Under no circumstances may an extreme telemetry value directly trigger a disaster alert or hazard warning:
+  $$\text{extreme reading} \not\longrightarrow \text{disaster alert}$$
+* Telemetry must always traverse:
+  1. Anomaly detection
+  2. Temporal consistency
+  3. Cross-sensor thermodynamic consistency
+  4. Cross-station spatial consistency
+  5. Weather-vs-sensor root cause classification
+* Only observations classified as authentic `genuine_weather` advance to event validation and risk assessment.
 
-### Rule 3: Do Not Overwrite Raw Weather Data
-* Raw sensor telemetry is an immutable historical record.
-* Once written to the database, a raw reading record must **never** be updated, overwritten, or truncated in place.
-* Value corrections, imputed estimates, or calibration adjustments must be stored as separate records in the `corrections` table, referencing the original `reading_id`.
-* The state transition of corrections (`SUGGESTED` $\to$ `PENDING_REVIEW` $\to$ `ACCEPTED` / `REJECTED`) ensures full traceability and scientific auditability.
+### Rule 5: `sensor_fault` Blocks Disaster Risk
+* If the decision engine classifies an atypical observation as a `sensor_fault`, the pipeline **strictly terminates** any progression to disaster event creation.
+* Hardware failures route exclusively to:
+  * Trust Score downgrading
+  * Fault archetype classification
+  * Imputed correction generation
+  * Digital Twin degradation logging
+  * Field maintenance queue dispatch
 
----
+### Rule 6: `uncertain` Blocks Automatic Public Risk
+* When evidence is conflicting, spatial station coverage is sparse, or confidence is borderline, the system classifies the observation as `uncertain`.
+* The system **never** forces an uncertain case into a binary decision.
+* Automated public risk warnings are **strictly prohibited** for uncertain observations; these cases are flagged for human meteorologist inspection.
 
-### Rule 4: Do Not Treat Anomaly Score as Trust Score
-* **Anomaly Score** $\ne$ **(100 - Trust Score)**.
-* An anomaly score indicates statistical rarity: a genuine Category 5 hurricane generates an extreme anomaly score, yet its readings are authentic and highly trustworthy (high Trust Score).
-* Conversely, a stuck pin or sensor drift may produce an anomaly that contradicts all neighbors, yielding a very low Trust Score.
-* Every developer must treat Trust Score calculation as an evidence-weighted synthesis, never an inverted anomaly score.
+### Rule 7: Public APIs Hide Engineering Internals
+* Public-facing endpoints (`/api/public/risk/{area}`) serve citizens, civic apps, and community stakeholders.
+* Public payloads must **never expose**:
+  * Internal sensor hardware IDs (e.g., `SNS-TMP-104`)
+  * Internal fault diagnostic codes (e.g., `multivariate_inconsistency`)
+  * ML model class names, versions, or raw weights
+  * Internal stack traces, raw error payloads, or debug logs
+* Public responses provide clean, non-technical hazard explanations and actionable safety guidance.
 
----
+### Rule 8: Official Advisories Are Never Fabricated
+* The system must **never manufacture or fabricate** official advisories from government agencies (e.g., IMD, NDMA, State Disaster Management Authorities).
+* Do not claim "IMD issued a Red Alert" or "NDMA ordered evacuations" unless an authenticated, verified external official feed has been integrated.
+* Default status for public advisories is:
+  `official_advisory_status: "check_official_sources"`.
+* When no validated hazard is active, return:
+  `{"status": "no_validated_risk", "area": "..."}`.
 
-### Rule 5: Do Not Force Uncertain Cases into a Binary Decision
-* The decision engine operates on a tri-state classification:
-  1. `genuine_weather`
-  2. `sensor_fault`
-  3. `uncertain`
-* When evidence is conflicting, sparse, or statistically inconclusive, the system **must** assign `uncertain`.
-* Never implement fallback heuristics that arbitrarily force borderline cases into `genuine_weather` or `sensor_fault`.
+### Rule 9: Team Modules Communicate Through Stable Contracts
+* Sub-teams collaborate exclusively across formal contracts documented in `docs/contracts/DATA_CONTRACTS.md`.
+* Backend routes must interact with ML models via decoupled adapters (`ml/integration/`) rather than importing model training scripts, internal tensors, or file formats directly.
+* Changes to internal implementations must not break public schemas, serialized payloads, or field types.
 
----
-
-### Rule 6: Do Not Fabricate Model Results
-* In development, testing, and mocking, never produce fake or hardcoded static values without explicit mock decorators/fixtures.
-* All mocked inference data must conform to the formal data contracts defined in `docs/contracts/DATA_CONTRACTS.md`.
-* Automated tests must verify actual logical pathways, edge conditions, and error states rather than tautological assertions.
-
----
-
-### Rule 7: Keep ML Integration Behind an Adapter
-* Backend services must never interact directly with raw ML model binaries (`.pkl`, `.onnx`, `.pt`), internal model tensors, or library-specific APIs (scikit-learn, PyTorch, TensorFlow).
-* All model invocations must flow through `ml/integration/` adapters.
-* If Manan updates an anomaly model from an Isolation Forest to a Graph Neural Network, only the internal adapter implementation changes—the backend service interfaces remain unchanged.
-
----
-
-### Rule 8: Use Comprehensive Type Hints
-* All Python functions, methods, and class attributes must include complete type annotations (`typing`, `pydantic`).
-* Example:
-  ```python
-  def calculate_trust_score(
-      anomaly_score: float,
-      evidence_weights: dict[str, float],
-  ) -> int:
-      ...
-  ```
-* Avoid untyped arguments, raw `Any` where specific types are definable, and untyped dictionaries for structured data.
-
----
-
-### Rule 9: Write Tests for All Critical Functionality
-* Every service module, utility function, and API endpoint must have corresponding test coverage in `tests/`.
-* Tests must cover:
-  * Positive paths (expected nominal inputs).
-  * Boundary conditions (e.g., 0% vs 100% humidity, extreme temperatures).
-  * Negative / error paths (malformed payloads, missing stations, network timeouts).
-* Tests must run reliably and deterministically via `pytest`.
-
----
-
-### Rule 10: Every Completed Phase Must Satisfy the Five Gates
-Every implementation phase in the SkyGuard AI roadmap must strictly fulfill:
-1. **CODE**: Clean, robust, modular implementation adhering to architectural boundaries.
-2. **DOCUMENTATION**: Updated architecture, API docs, or README reflecting the changes.
-3. **TEST**: Automated unit/integration tests verifying the new behavior.
-4. **VERIFICATION**: Manual or script-driven verification proving the system behaves as expected.
-5. **GIT COMMIT**: Atomic commit with a conventional commit message pushed to the designated branch.
+### Rule 10: Standard Module Quality Gate
+Every functional module implementation across all project phases must satisfy the complete engineering lifecycle before completion:
+$$\text{Code} + \text{Docs} + \text{Sample Input} + \text{Sample Output} + \text{Test} + \text{Commit} + \text{Integration Check}$$
+No phase is considered complete without passing all automated tests and verifying schema compliance.
 
 ---
 
 ## 3. Git & Branching Conventions
 
-* **Primary Development Branch for Mitali**: `mitali`
-* **Commit Message Format**: Follow conventional commits:
+* **Baseline Branch**: `mitali`
+* **Active Development Branch**: `mitali-skyguard-integration`
+* **Commit Message Format**: Adhere strictly to Conventional Commits:
   * `feat:` A new feature or capability.
   * `fix:` A bug fix.
-  * `docs:` Documentation-only changes.
-  * `refactor:` Code restructuring without changing external behavior.
-  * `test:` Adding or updating tests.
-  * `chore:` Build process, dependencies, or configuration changes.
+  * `docs:` Documentation or architectural contract updates.
+  * `refactor:` Code restructuring without behavior alteration.
+  * `test:` Adding or updating automated test suites.
+  * `chore:` Dependencies, build scripts, or tool configuration.
 * **Prohibitions**:
-  * Never commit directly to `main`.
-  * Never merge work to `main` without team review and approval.
-  * Never force push (`git push --force`) to shared branches.
+  * **Never commit directly to `main`**.
+  * **Never modify `main`**.
+  * **Never merge into `main` without explicit peer review and authorization**.
+  * **Never force push (`git push --force`) to shared team branches**.
