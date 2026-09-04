@@ -74,14 +74,28 @@ app.include_router(replay_router, prefix="/api")
 app.include_router(ws_router)
 
 
+from pathlib import Path
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
+
+# Detect built frontend assets
+frontend_dist = Path(__file__).resolve().parent.parent.parent / "frontend" / "dist"
+assets_dir = frontend_dist / "assets"
+if assets_dir.exists():
+    app.mount("/assets", StaticFiles(directory=str(assets_dir)), name="assets")
+
+
 @app.get(
     "/",
     tags=["Root"],
     summary="Root service information",
     description="Returns backend running status and version.",
 )
-def root_endpoint() -> dict:
-    """Return root status message."""
+def root_endpoint(request: Request):
+    """Return frontend web application for browsers, or service JSON for API clients."""
+    accept = request.headers.get("accept", "")
+    if "text/html" in accept and (frontend_dist / "index.html").exists():
+        return FileResponse(frontend_dist / "index.html")
     return {
         "message": "SkyGuard AI backend is running",
         "version": settings.APP_VERSION,
@@ -100,6 +114,29 @@ def health_endpoint() -> dict:
         "status": "ok",
         "service": "skyguard-backend",
     }
+
+
+# SPA client-side routing fallback for web pages
+@app.get("/{full_path:path}", include_in_schema=False)
+async def spa_fallback(full_path: str, request: Request):
+    if any(full_path.startswith(p) for p in ("api", "ws", "docs", "redoc", "openapi")):
+        return JSONResponse(
+            status_code=404,
+            content={"error": "not_found", "message": f"Endpoint '/{full_path}' not found"},
+        )
+
+    file_candidate = frontend_dist / full_path
+    if full_path and file_candidate.is_file():
+        return FileResponse(file_candidate)
+
+    index_file = frontend_dist / "index.html"
+    if index_file.exists():
+        return FileResponse(index_file)
+
+    return JSONResponse(
+        status_code=404,
+        content={"error": "not_found", "message": f"Resource '/{full_path}' not found"},
+    )
 
 
 @app.exception_handler(Exception)
