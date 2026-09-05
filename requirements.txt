@@ -11,11 +11,13 @@ python-dotenv
 
 # Database ORM
 sqlalchemy
+psycopg2-binary
 
 # Data Processing & Analysis
 pandas
 numpy
 scikit-learn
+torch
 
 # Testing & Client
 pytest
